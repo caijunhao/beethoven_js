@@ -52,7 +52,8 @@
                 // use of RoughnessMipmapper is optional
                 const roughnessMipmapper = new RoughnessMipmapper( renderer );
 
-                const loader = new GLTFLoader().setPath( 'models/gltf/BN/glTF/' );
+                //const loader = new GLTFLoader().setPath( 'models/gltf/BN/glTF/' );
+                const loader = new GLTFLoader().setPath( 'models/gltf/BN_noroom_GTLF/glTF/' );
                 loader.load( 'BN.gltf', function ( gltf ) {
 
                     gltf.scene.traverse( function ( child ) {
