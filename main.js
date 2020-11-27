@@ -1,8 +1,19 @@
 console.log("Hello World!")
 
+let step = 0, lon = 0, lat = 0;
+let phi = 0, theta = 0;
+let radius = 1;
+let height = 1.5;
+let targetPos = new THREE.Vector3(0, height, 0)
+let onPointerDownPointerX, onPointerDownPointerY, onPointerDownLon, onPointerDownLat;
+
 var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera(50, window.innerWidth/window.innerHeight, 0.1, 100);
+scene.position.set(0, 0, 0);
+var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 100);
 var renderer = new THREE.WebGLRenderer();
+document.body.appendChild( renderer.domElement );
+document.addEventListener( 'pointerdown', onPointerDown, false );
+document.addEventListener( 'wheel', onDocumentMouseWheel, false );
 
 const controls = new THREE.OrbitControls( camera, renderer.domElement );
 controls.minDistance = 1;
@@ -10,12 +21,35 @@ controls.maxDistance = 20;
 
 window.addEventListener( 'resize', onWindowResize, false );
 function onWindowResize() {
-
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
-
   renderer.setSize( window.innerWidth, window.innerHeight );
 
+}
+function onPointerDown( event ) {
+  event.preventDefault();
+  onPointerDownPointerX = event.clientX;
+  onPointerDownPointerY = event.clientY;
+  onPointerDownLon = lon;
+  onPointerDownLat = lat;
+  document.addEventListener( 'pointermove', onPointerMove, false );
+  document.addEventListener( 'pointerup', onPointerUp, false );
+}
+
+function onPointerMove( event ) {
+  lon = ( event.clientX - onPointerDownPointerX ) * 0.1 + onPointerDownLon;
+  lat = ( event.clientY - onPointerDownPointerY ) * 0.1 + onPointerDownLat;
+}
+
+function onPointerUp() {
+  document.removeEventListener( 'pointermove', onPointerMove, false );
+  document.removeEventListener( 'pointerup', onPointerUp, false );
+}
+
+function onDocumentMouseWheel( event ) {
+  const fov = camera.fov + event.deltaY * 0.05;
+  camera.fov = THREE.MathUtils.clamp( fov, 10, 75 );
+  camera.updateProjectionMatrix();
 }
 
 
@@ -39,8 +73,8 @@ new THREE.RGBELoader()
         // use of RoughnessMipmapper is optional
         // const roughnessMipmapper = new THREE.RoughnessMipmapper( renderer );
 
-        const loader = new THREE.GLTFLoader().setPath( 'models/gltf/BN_noroom/glTF/' );
-        loader.load( 'BN.gltf', function ( gltf ) {
+        const loader = new THREE.GLTFLoader().setPath( 'models/gltf/BN_20201127/glTF/' );
+        loader.load( 'BN_20201127.gltf', function ( gltf ) {
 
             gltf.scene.traverse( function ( child ) {
 
@@ -71,23 +105,94 @@ const pmremGenerator = new THREE.PMREMGenerator(renderer);
 pmremGenerator.compileEquirectangularShader();
 
 // point light
-let bulbLight, bulbMat;
-bulbMat, bulbLight = init_point_light(1, 1, 1);
-bulbLight.castShadow = true;
-scene.add( bulbLight );
+// let bulbLight, bulbMat;
+// bulbMat, bulbLight = init_point_light(1, 1, 1);
+// bulbLight.castShadow = true;
+// scene.add( bulbLight );
 
 let hemiLight;
 hemiLight = new THREE.HemisphereLight( 0xddeeff, 0x0f0e0d, 0.02);
 scene.add( hemiLight );
 
-let candleLight, candleMat, candleMesh, flameMaterials;
-function helper(materials, light){
-  flameMaterials = materials;
-  candleLight = light;
-}
-candleMat, candleMesh = get_candle(helper);
-candleMesh.castShadow = true;
-scene.add(candleMesh);
+let flameMaterials = [];
+let candleLights = [];
+
+let candleLight1, candleMat1, candleMesh1, flameMaterials1;
+candleMat1, candleMesh1 = get_candle(function (materials, light){
+  flameMaterials1 = materials;
+  candleLight1 = light;
+}, 0.03);
+candleLights.push(candleLight1);
+flameMaterials.push(flameMaterials1);
+candleMesh1.castShadow = true;
+candleMesh1.position.set(0.1687, 1.56, 2.24)
+scene.add(candleMesh1);
+
+let candleLight2, candleMat2, candleMesh2, flameMaterials2;
+candleMat2, candleMesh2 = get_candle(function (materials, light){
+  flameMaterials2 = materials;
+  candleLight2 = light;
+}, 0.02);
+candleLights.push(candleLight2);
+flameMaterials.push(flameMaterials2);
+candleMesh2.castShadow = true;
+candleMesh2.position.set(0.1997, 1.37, 2.117)
+scene.add(candleMesh2);
+
+let candleLight3, candleMat3, candleMesh3, flameMaterials3;
+candleMat3, candleMesh3 = get_candle(function (materials, light){
+  flameMaterials3 = materials;
+  candleLight3 = light;
+}, 0.02);
+candleLights.push(candleLight3);
+flameMaterials.push(flameMaterials3);
+candleMesh3.castShadow = true;
+candleMesh3.position.set(0.06212, 1.416, 2.157)
+scene.add(candleMesh3);
+
+let candleLight4, candleMat4, candleMesh4, flameMaterials4;
+candleMat4, candleMesh4 = get_candle(function (materials, light){
+  flameMaterials4 = materials;
+  candleLight4 = light;
+}, 0.03);
+candleLights.push(candleLight4);
+flameMaterials.push(flameMaterials4);
+candleMesh4.castShadow = true;
+candleMesh4.position.set(-0.9629, 1.658, 2.362)
+scene.add(candleMesh4);
+
+let candleLight5, candleMat5, candleMesh5, flameMaterials5;
+candleMat5, candleMesh5 = get_candle(function (materials, light){
+  flameMaterials5 = materials;
+  candleLight5 = light;
+}, 0.02);
+candleLights.push(candleLight5);
+flameMaterials.push(flameMaterials5);
+candleMesh5.castShadow = true;
+candleMesh5.position.set(-0.919, 1.62, 2.303)
+scene.add(candleMesh5);
+
+let candleLight6, candleMat6, candleMesh6, flameMaterials6;
+candleMat6, candleMesh6 = get_candle(function (materials, light){
+  flameMaterials6 = materials;
+  candleLight6 = light;
+}, 0.02);
+candleLights.push(candleLight6);
+flameMaterials.push(flameMaterials6);
+candleMesh6.castShadow = true;
+candleMesh6.position.set(-0.9885, 1.586, 2.284)
+scene.add(candleMesh6);
+
+let candleLight7, candleMat7, candleMesh7, flameMaterials7;
+candleMat7, candleMesh7 = get_candle(function (materials, light){
+  flameMaterials7 = materials;
+  candleLight7 = light;
+}, 0.02);
+candleLights.push(candleLight7);
+flameMaterials.push(flameMaterials7);
+candleMesh7.castShadow = true;
+candleMesh7.position.set(1.581, 0.938, 2.199)
+scene.add(candleMesh7);
 
 // floor
 let floorMesh, floorMat;
@@ -123,26 +228,41 @@ renderer.setPixelRatio( window.devicePixelRatio );
 renderer.setSize( window.innerWidth, window.innerHeight );
 
 //camera
-camera.position.x=2;
-camera.position.y=2;
-camera.position.z=2;
-camera.lookAt(scene.position);
+// camera.position.x=4;
+// camera.position.y=4;
+// camera.position.z=-4;
+// scene.position.x = 0;
+// scene.position.y = 0;
+// scene.position.z = 0;
+// camera.lookAt(scene.position);
 
 $('#first-threejs').append(renderer.domElement);
-
-
-let step = 0;
 
 function renderScene() 
 {
   requestAnimationFrame(renderScene);
   //make updates to position, rotation of objects in the Scene
-  step+=0.02;
-  flameMaterials[0].uniforms.time.value = step;
-  flameMaterials[1].uniforms.time.value = step;
-  candleLight.position.x = Math.sin(step * Math.PI) * 0.25;
-  candleLight.position.z = Math.cos(step * Math.PI * 0.75) * 0.25;
-  candleLight.intensity = 2 + Math.sin(step * Math.PI * 2) * Math.cos(step * Math.PI * 1.5) * 0.25;
+  step+=0.01;
+  lon += .15;
+  lat = Math.max(- 85, Math.min(85, lat));
+  phi = THREE.MathUtils.degToRad(90-lat);
+  theta = THREE.MathUtils.degToRad(lon);
+  for(let i=0; i < flameMaterials.length; i++){
+    flameMaterials[i][0].uniforms.time.value = step;
+    flameMaterials[i][1].uniforms.time.value = step;
+    candleLights[i].position.x = Math.sin(step * Math.PI) * 0.25;
+    candleLights[i].position.z = Math.cos(step * Math.PI * 0.75) * 0.25;
+    candleLights[i].intensity = 2 + Math.sin(step * Math.PI * 2) * Math.cos(step * Math.PI * 1.5) * 0.25;
+  }
+  camera.position.x = radius * Math.sin( phi ) * Math.cos( theta );
+	camera.position.y = height;  // radius * Math.cos( phi )
+	camera.position.z = radius * Math.sin( phi ) * Math.sin( theta );
+  camera.lookAt(targetPos);
+  // flameMaterials1[0].uniforms.time.value = step;
+  // flameMaterials1[1].uniforms.time.value = step;
+  // candleLight1.position.x = Math.sin(step * Math.PI) * 0.25;
+  // candleLight1.position.z = Math.cos(step * Math.PI * 0.75) * 0.25;
+  // candleLight1.intensity = 2 + Math.sin(step * Math.PI * 2) * Math.cos(step * Math.PI * 1.5) * 0.25;
   renderer.render(scene, camera); 
 }
 
