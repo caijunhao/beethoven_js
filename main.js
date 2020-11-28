@@ -1,8 +1,15 @@
-console.log("Hello World!")
+console.log("Beethoven's Night")
+
+let params = {
+  panorama: true, 
+}
+const gui = new dat.GUI();
+gui.add(params, 'panorama').name('Panorama');
+gui.open();
 
 let step = 0, lon = 0, lat = 0;
 let phi = 0, theta = 0;
-let radius = 1;
+let radius = 1.5;
 let height = 1.5;
 let targetPos = new THREE.Vector3(0, height, 0)
 let onPointerDownPointerX, onPointerDownPointerY, onPointerDownLon, onPointerDownLat;
@@ -12,14 +19,14 @@ scene.position.set(0, 0, 0);
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 100);
 var renderer = new THREE.WebGLRenderer();
 document.body.appendChild( renderer.domElement );
-document.addEventListener( 'pointerdown', onPointerDown, false );
-document.addEventListener( 'wheel', onDocumentMouseWheel, false );
+document.addEventListener( 'pointerdown', onPointerDown, false);
+document.addEventListener( 'wheel', onDocumentMouseWheel, true);
 
 const controls = new THREE.OrbitControls( camera, renderer.domElement );
 controls.minDistance = 1;
-controls.maxDistance = 20;
+controls.maxDistance = 3;
 
-window.addEventListener( 'resize', onWindowResize, false );
+window.addEventListener( 'resize', onWindowResize, true);
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
@@ -158,7 +165,7 @@ candleMat4, candleMesh4 = get_candle(function (materials, light){
 candleLights.push(candleLight4);
 flameMaterials.push(flameMaterials4);
 candleMesh4.castShadow = true;
-candleMesh4.position.set(-0.9629, 1.658, 2.362)
+candleMesh4.position.set(1.25, 0.8713, -0.2855)
 scene.add(candleMesh4);
 
 let candleLight5, candleMat5, candleMesh5, flameMaterials5;
@@ -169,7 +176,7 @@ candleMat5, candleMesh5 = get_candle(function (materials, light){
 candleLights.push(candleLight5);
 flameMaterials.push(flameMaterials5);
 candleMesh5.castShadow = true;
-candleMesh5.position.set(-0.919, 1.62, 2.303)
+candleMesh5.position.set(1.291, 0.8321, -0.3404)
 scene.add(candleMesh5);
 
 let candleLight6, candleMat6, candleMesh6, flameMaterials6;
@@ -180,7 +187,7 @@ candleMat6, candleMesh6 = get_candle(function (materials, light){
 candleLights.push(candleLight6);
 flameMaterials.push(flameMaterials6);
 candleMesh6.castShadow = true;
-candleMesh6.position.set(-0.9885, 1.586, 2.284)
+candleMesh6.position.set(1.232, 0.8001, -0.363)
 scene.add(candleMesh6);
 
 let candleLight7, candleMat7, candleMesh7, flameMaterials7;
@@ -207,16 +214,116 @@ textureLoader.load( "textures/hardwood2_diffuse.jpg", function ( map ) {
   map.wrapS = THREE.RepeatWrapping;
   map.wrapT = THREE.RepeatWrapping;
   map.anisotropy = 4;
-  map.repeat.set( 10, 24 );
+  map.repeat.set(5, 4);
   map.encoding = THREE.sRGBEncoding;
   floorMat.map = map;
   floorMat.needsUpdate = true;
 } );
-let floorGeometry = new THREE.PlaneBufferGeometry( 20, 20 );
+let floorGeometry = new THREE.PlaneBufferGeometry(5, 4);
 floorMesh = new THREE.Mesh(floorGeometry, floorMat);
 floorMesh.receiveShadow = true;
 floorMesh.rotation.x = - Math.PI / 2.0;
+floorMesh.rotation.z =  Math.PI / 2.0;
 scene.add(floorMesh);
+
+// wall1
+let wallMesh1, wallMat1;
+wallMat1 = new THREE.MeshStandardMaterial( {
+  roughness: 1.0,
+  color: 0xffffff,
+  metalness: 0.4,
+  bumpScale: 0.01
+} );
+textureLoader.load( "textures/wallpaper/TexturesCom_WallpaperForties0070_seamless_S.jpg", function ( map ) {
+  map.wrapS = THREE.RepeatWrapping;
+  map.wrapT = THREE.RepeatWrapping;
+  map.anisotropy = 4;
+  map.repeat.set(5, 4);
+  map.encoding = THREE.sRGBEncoding;
+  wallMat1.map = map;
+  wallMat1.needsUpdate = true;
+} );
+let wallGeometry1 = new THREE.PlaneBufferGeometry(4, 2.6);
+wallMesh1 = new THREE.Mesh(wallGeometry1, wallMat1);
+wallMesh1.receiveShadow = true;
+wallMesh1.position.z = -2.5;
+wallMesh1.position.y = 1.3;
+scene.add(wallMesh1);
+
+// wall2
+let wallMesh2, wallMat2;
+wallMat2 = new THREE.MeshStandardMaterial( {
+  roughness: 1.0,
+  color: 0xffffff,
+  metalness: 0.4,
+  bumpScale: 0.01
+} );
+textureLoader.load( "textures/wallpaper/TexturesCom_WallpaperForties0070_seamless_S.jpg", function ( map ) {
+  map.wrapS = THREE.RepeatWrapping;
+  map.wrapT = THREE.RepeatWrapping;
+  map.anisotropy = 4;
+  map.repeat.set(5, 4);
+  map.encoding = THREE.sRGBEncoding;
+  wallMat2.map = map;
+  wallMat2.needsUpdate = true;
+} );
+let wallGeometry2 = new THREE.PlaneBufferGeometry(4, 2.6);
+wallMesh2 = new THREE.Mesh(wallGeometry2, wallMat2);
+wallMesh2.receiveShadow = true;
+wallMesh2.position.z = 2.5;
+wallMesh2.position.y = 1.3;
+wallMesh2.rotation.y = Math.PI;
+scene.add(wallMesh2);
+
+// wall3
+let wallMesh3, wallMat3;
+wallMat3 = new THREE.MeshStandardMaterial( {
+  roughness: 1.0,
+  color: 0xffffff,
+  metalness: 0.4,
+  bumpScale: 0.01
+} );
+textureLoader.load( "textures/wallpaper/TexturesCom_WallpaperForties0070_seamless_S.jpg", function ( map ) {
+  map.wrapS = THREE.RepeatWrapping;
+  map.wrapT = THREE.RepeatWrapping;
+  map.anisotropy = 4;
+  map.repeat.set(5, 4);
+  map.encoding = THREE.sRGBEncoding;
+  wallMat3.map = map;
+  wallMat3.needsUpdate = true;
+} );
+let wallGeometry3 = new THREE.PlaneBufferGeometry(5, 2.6);
+wallMesh3 = new THREE.Mesh(wallGeometry3, wallMat3);
+wallMesh3.receiveShadow = true;
+wallMesh3.position.x = 2;
+wallMesh3.position.y = 1.3;
+wallMesh3.rotation.y = -Math.PI/2;
+scene.add(wallMesh3);
+
+// wall4
+let wallMesh4, wallMat4;
+wallMat4 = new THREE.MeshStandardMaterial( {
+  roughness: 1.0,
+  color: 0xffffff,
+  metalness: 0.4,
+  bumpScale: 0.01
+} );
+textureLoader.load( "textures/wallpaper/TexturesCom_WallpaperForties0070_seamless_S.jpg", function ( map ) {
+  map.wrapS = THREE.RepeatWrapping;
+  map.wrapT = THREE.RepeatWrapping;
+  map.anisotropy = 4;
+  map.repeat.set(5, 4);
+  map.encoding = THREE.sRGBEncoding;
+  wallMat4.map = map;
+  wallMat4.needsUpdate = true;
+} );
+let wallGeometry4 = new THREE.PlaneBufferGeometry(5, 2.6);
+wallMesh4 = new THREE.Mesh(wallGeometry4, wallMat4);
+wallMesh4.receiveShadow = true;
+wallMesh4.position.x = -2;
+wallMesh4.position.y = 1.3;
+wallMesh4.rotation.y = Math.PI/2;
+scene.add(wallMesh4);
 
 renderer.antialias = true;
 renderer.physicallyCorrectLights = true;
@@ -254,10 +361,12 @@ function renderScene()
     candleLights[i].position.z = Math.cos(step * Math.PI * 0.75) * 0.25;
     candleLights[i].intensity = 2 + Math.sin(step * Math.PI * 2) * Math.cos(step * Math.PI * 1.5) * 0.25;
   }
-  camera.position.x = radius * Math.sin( phi ) * Math.cos( theta );
-	camera.position.y = height;  // radius * Math.cos( phi )
-	camera.position.z = radius * Math.sin( phi ) * Math.sin( theta );
-  camera.lookAt(targetPos);
+  if(params.panorama){
+    camera.position.x = radius * Math.sin( phi ) * Math.cos( theta );
+    camera.position.y = height;  // radius * Math.cos( phi )
+    camera.position.z = radius * Math.sin( phi ) * Math.sin( theta );
+    camera.lookAt(targetPos);
+  }
   // flameMaterials1[0].uniforms.time.value = step;
   // flameMaterials1[1].uniforms.time.value = step;
   // candleLight1.position.x = Math.sin(step * Math.PI) * 0.25;
