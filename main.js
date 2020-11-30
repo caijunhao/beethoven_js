@@ -2,9 +2,11 @@ console.log("Beethoven's Night")
 
 let params = {
     panorama: true,
+    audio: false
 }
 const gui = new dat.GUI();
 gui.add(params, 'panorama').name('Panorama');
+gui.add(params, 'audio').name('BGM');
 gui.open();
 
 let step = 0, lon = 0, lat = 0;
@@ -21,6 +23,44 @@ var renderer = new THREE.WebGLRenderer();
 document.body.appendChild(renderer.domElement);
 document.addEventListener('pointerdown', onPointerDown, false);
 document.addEventListener('wheel', onDocumentMouseWheel, true);
+
+// audio
+// create an AudioListener and add it to the camera
+const listener = new THREE.AudioListener();
+camera.add(listener);
+// create a global audio source
+const sound = new THREE.Audio( listener );
+const file = 'src/audio/Dawdio - Moonlight Sonata Trapped Within a Music Box.flac';
+// load a sound and set it as the Audio object's buffer
+const audioLoader = new THREE.AudioLoader();
+audioLoader.load(file, function (buffer) {
+    sound.setBuffer(buffer);
+    sound.setLoop(true);
+    sound.setVolume(0.3);
+});
+sound.hasPlaybackControl = false;
+
+function BGM_Control() {
+    if(params.audio) {
+        if(sound.hasPlaybackControl) {
+            console.log("BGM is playing.")
+        }
+        else {
+            sound.hasPlaybackControl = true;
+            sound.play();
+
+        }
+    }
+    else {
+        if (sound.hasPlaybackControl) {
+            sound.pause();
+            sound.hasPlaybackControl = false;
+        }
+    }
+}
+
+
+
 
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.minDistance = 1;
@@ -90,8 +130,8 @@ new THREE.RGBELoader()
         const dracoLoader = new THREE.DRACOLoader();
         dracoLoader.setDecoderPath('examples/js/libs/draco/');
         loader.setDRACOLoader(dracoLoader);
-        loader.setPath( 'examples/models/gltf/BN_GLTF_20201128_compressed/glTF/' );
-        loader.load('BN_20201128.gltf', function (gltf) {
+        loader.setPath( 'examples/models/gltf/BN_GLTF_20201129_demeshed_compressed/glTF/' );
+        loader.load('BN_20201129.gltf', function (gltf) {
 
             gltf.scene.traverse(function (child) {
 
@@ -355,6 +395,9 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 
 $('#first-threejs').append(renderer.domElement);
 
+
+
+
 function renderScene() {
     requestAnimationFrame(renderScene);
     //make updates to position, rotation of objects in the Scene
@@ -382,7 +425,9 @@ function renderScene() {
     // candleLight1.position.z = Math.cos(step * Math.PI * 0.75) * 0.25;
     // candleLight1.intensity = 2 + Math.sin(step * Math.PI * 2) * Math.cos(step * Math.PI * 1.5) * 0.25;
     renderer.render(scene, camera);
+    // BGM control
+    BGM_Control();
 }
-
-
 renderScene();
+
+
