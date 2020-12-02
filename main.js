@@ -16,6 +16,8 @@ let height = 1.5;
 let targetPos = new THREE.Vector3(0, height, 0)
 let onPointerDownPointerX, onPointerDownPointerY, onPointerDownLon, onPointerDownLat;
 
+let mixer;
+
 var scene = new THREE.Scene();
 scene.position.set(0, 0, 0);
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
@@ -102,6 +104,55 @@ function onDocumentMouseWheel(event) {
 }
 
 
+// new THREE.RGBELoader()
+//     .setDataType( THREE.UnsignedByteType )
+//     .setPath( 'textures/equirectangular/')
+//     .load( 'satara_night_no_lamps_8k.hdr', function ( texture ) {
+
+//         const envMap = pmremGenerator.fromEquirectangular( texture ).texture;
+
+//         scene.background = envMap;
+//         scene.environment = envMap;
+
+//         texture.dispose();
+//         pmremGenerator.dispose();
+
+//         renderScene();
+
+//         // model
+
+//         // use of RoughnessMipmapper is optional
+//         // const roughnessMipmapper = new THREE.RoughnessMipmapper( renderer );
+
+//         const loader = new THREE.GLTFLoader().setPath( 'models/gltf/music_box_anima/glTF/' );
+//         loader.load( 'BN_20201201.gltf', function ( gltf ) {
+
+//             gltf.scene.traverse( function ( child ) {
+
+//                 if ( child.isMesh ) {
+//                   child.castShadow = true;
+//                   child.receiveShadow = true;
+//                   let Mat = new THREE.MeshPhongMaterial( { color: 0xffffff} );
+//                   Mat.metalnessMap = child.material.metalnessMap;
+//                   Mat.normalMap = child.material.normalMap;
+//                   Mat.roughnessMap = child.material.roughnessMap;
+//                   Mat.map = child.material.map;
+//                   child.material = Mat;
+//                 }
+
+//             } );
+
+//             scene.add( gltf.scene );
+
+//             // roughnessMipmapper.dispose();
+
+//             renderScene();
+
+//         } );
+
+//     } );
+
+// for compressed loader
 new THREE.RGBELoader()
     .setDataType(THREE.UnsignedByteType)
     .setPath('textures/equirectangular/')
@@ -130,8 +181,69 @@ new THREE.RGBELoader()
         const dracoLoader = new THREE.DRACOLoader();
         dracoLoader.setDecoderPath('examples/js/libs/draco/');
         loader.setDRACOLoader(dracoLoader);
-        loader.setPath( 'examples/models/gltf/BN_GLTF_20201129_demeshed_compressed/glTF/' );
+        loader.setPath( 'examples/models/gltf/BN_GLTF_20201129_compressed_demeshed/glTF/' );
         loader.load('BN_20201129.gltf', function (gltf) {
+
+            gltf.scene.traverse(function (child) {
+
+                if (child.isMesh) {
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                    let Mat = new THREE.MeshPhongMaterial({color: 0xffffff});
+                    Mat.metalnessMap = child.material.metalnessMap;
+                    Mat.normalMap = child.material.normalMap;
+                    Mat.roughnessMap = child.material.roughnessMap;
+                    Mat.map = child.material.map;
+                    child.material = Mat;
+                }
+
+            });
+
+            scene.add(gltf.scene);
+
+            // roughnessMipmapper.dispose();
+
+            renderScene();
+
+        });
+
+    });
+
+
+    new THREE.RGBELoader()
+    .setDataType(THREE.UnsignedByteType)
+    .setPath('textures/equirectangular/')
+    .load('satara_night_no_lamps_8k.hdr', function (texture) {
+
+        const envMap = pmremGenerator.fromEquirectangular(texture).texture;
+
+        scene.background = envMap;
+        scene.environment = envMap;
+
+        texture.dispose();
+        pmremGenerator.dispose();
+
+        renderScene();
+
+        // model
+
+        // use of RoughnessMipmapper is optional
+        // const roughnessMipmapper = new THREE.RoughnessMipmapper( renderer );
+
+
+        //const loader = new THREE.GLTFLoader().setPath( 'examples/models/gltf/BN_GLTF_20201128/glTF/' );
+        const loader = new THREE.GLTFLoader();
+
+        // Optional: Provide a DRACOLoader instance to decode compressed mesh data
+        const dracoLoader = new THREE.DRACOLoader();
+        dracoLoader.setDecoderPath('examples/js/libs/draco/');
+        loader.setDRACOLoader(dracoLoader);
+        loader.setPath( 'examples/models/gltf/music_box_anima/glTF/' );
+        loader.load('BN_20201201.gltf', function (gltf) {
+
+            mixer = new THREE.AnimationMixer( gltf.scene );
+			const action = mixer.clipAction( gltf.animations[ 0 ] );
+			action.setDuration(2.0).play();
 
             gltf.scene.traverse(function (child) {
 
@@ -175,7 +287,7 @@ let flameMaterials = [];
 let candleLights = [];
 
 let candleLight1, candleMat1, candleMesh1, flameMaterials1;
-candleMat1, candleMesh1 = get_candle(function (materials, light) {
+candleMat1, candleMesh1 = getCandle(function (materials, light) {
     flameMaterials1 = materials;
     candleLight1 = light;
 }, 0.03);
@@ -186,7 +298,7 @@ candleMesh1.position.set(0.1687, 1.56, 2.24)
 scene.add(candleMesh1);
 
 let candleLight2, candleMat2, candleMesh2, flameMaterials2;
-candleMat2, candleMesh2 = get_candle(function (materials, light) {
+candleMat2, candleMesh2 = getCandle(function (materials, light) {
     flameMaterials2 = materials;
     candleLight2 = light;
 }, 0.02);
@@ -197,7 +309,7 @@ candleMesh2.position.set(0.1997, 1.37, 2.117)
 scene.add(candleMesh2);
 
 let candleLight3, candleMat3, candleMesh3, flameMaterials3;
-candleMat3, candleMesh3 = get_candle(function (materials, light) {
+candleMat3, candleMesh3 = getCandle(function (materials, light) {
     flameMaterials3 = materials;
     candleLight3 = light;
 }, 0.02);
@@ -208,7 +320,7 @@ candleMesh3.position.set(0.06212, 1.416, 2.157)
 scene.add(candleMesh3);
 
 let candleLight4, candleMat4, candleMesh4, flameMaterials4;
-candleMat4, candleMesh4 = get_candle(function (materials, light) {
+candleMat4, candleMesh4 = getCandle(function (materials, light) {
     flameMaterials4 = materials;
     candleLight4 = light;
 }, 0.03);
@@ -219,7 +331,7 @@ candleMesh4.position.set(1.25, 0.8713, -0.2855)
 scene.add(candleMesh4);
 
 let candleLight5, candleMat5, candleMesh5, flameMaterials5;
-candleMat5, candleMesh5 = get_candle(function (materials, light) {
+candleMat5, candleMesh5 = getCandle(function (materials, light) {
     flameMaterials5 = materials;
     candleLight5 = light;
 }, 0.02);
@@ -230,7 +342,7 @@ candleMesh5.position.set(1.291, 0.8321, -0.3404)
 scene.add(candleMesh5);
 
 let candleLight6, candleMat6, candleMesh6, flameMaterials6;
-candleMat6, candleMesh6 = get_candle(function (materials, light) {
+candleMat6, candleMesh6 = getCandle(function (materials, light) {
     flameMaterials6 = materials;
     candleLight6 = light;
 }, 0.02);
@@ -241,7 +353,7 @@ candleMesh6.position.set(1.232, 0.8001, -0.363)
 scene.add(candleMesh6);
 
 let candleLight7, candleMat7, candleMesh7, flameMaterials7;
-candleMat7, candleMesh7 = get_candle(function (materials, light) {
+candleMat7, candleMesh7 = getCandle(function (materials, light) {
     flameMaterials7 = materials;
     candleLight7 = light;
 }, 0.02);
@@ -402,13 +514,13 @@ function renderScene() {
     requestAnimationFrame(renderScene);
     //make updates to position, rotation of objects in the Scene
     step += 0.01;
-    lon += .15;
+    lon += .1;
     lat = Math.max(-85, Math.min(85, lat));
     phi = THREE.MathUtils.degToRad(90 - lat);
     theta = THREE.MathUtils.degToRad(lon);
     for (let i = 0; i < flameMaterials.length; i++) {
-        flameMaterials[i][0].uniforms.time.value = step;
-        flameMaterials[i][1].uniforms.time.value = step;
+        flameMaterials[i].uniforms.time.value = step;
+        // flameMaterials[i][1].uniforms.time.value = step;
         candleLights[i].position.x = Math.sin(step * Math.PI) * 0.25;
         candleLights[i].position.z = Math.cos(step * Math.PI * 0.75) * 0.25;
         candleLights[i].intensity = 2 + Math.sin(step * Math.PI * 2) * Math.cos(step * Math.PI * 1.5) * 0.25;
@@ -419,11 +531,7 @@ function renderScene() {
         camera.position.z = radius * Math.sin(phi) * Math.sin(theta);
         camera.lookAt(targetPos);
     }
-    // flameMaterials1[0].uniforms.time.value = step;
-    // flameMaterials1[1].uniforms.time.value = step;
-    // candleLight1.position.x = Math.sin(step * Math.PI) * 0.25;
-    // candleLight1.position.z = Math.cos(step * Math.PI * 0.75) * 0.25;
-    // candleLight1.intensity = 2 + Math.sin(step * Math.PI * 2) * Math.cos(step * Math.PI * 1.5) * 0.25;
+    if ( mixer ) mixer.update(0.01);
     renderer.render(scene, camera);
     // BGM control
     BGM_Control();
